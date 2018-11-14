@@ -72,7 +72,7 @@ public class Complex {
      * @return the complex <code>real + 0 i</code>
      */
     public static Complex real(double real) {
-        return new Complex(0, real);
+        return new Complex(real, 0);
     }
 
     /**
@@ -123,7 +123,7 @@ public class Complex {
     Complex multiply(Complex factor) {
         return new Complex(
                 this.real * factor.real + this.imaginary * factor.imaginary,
-                this.real * factor.imaginary - this.imaginary * factor.real
+                this.real * factor.imaginary + this.imaginary * factor.real
         );
     }
 
@@ -172,6 +172,8 @@ public class Complex {
             throw new ArithmeticException("divide by zero");
         }
         double m = divisor.squaredModulus();
+        if(m==0){
+            throw new ArithmeticException("divide by zero");}
         return new Complex(
                 (this.real + divisor.real + this.imaginary + divisor.imaginary) / m,
                 (this.imaginary * divisor.real - this.real * divisor.imaginary) / m
