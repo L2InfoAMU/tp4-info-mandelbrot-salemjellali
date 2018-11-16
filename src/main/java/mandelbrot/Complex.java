@@ -4,7 +4,6 @@ import java.util.Objects;
 
 /**
  * A class to represent complex numbers and their arithmetic.
- * <p>
  * Complex numbers are immutable.
  */
 public class Complex {
@@ -19,13 +18,8 @@ public class Complex {
      */
     final double imaginary;
 
+    // @param imaginary imaginary component
 
-    /**
-     * Creates a complex number given the real and the imaginary components
-     *
-     * @param real      real component
-     * @param imaginary imaginary component
-     */
     public Complex(double real, double imaginary) {
         this.real = real;
         this.imaginary = imaginary;
@@ -55,141 +49,99 @@ public class Complex {
         return imaginary;
     }
 
-    /**
-     * Creates complex numbers corresponding to rotations
-     *
-     * @param radians the angle of the rotation (counterclockwise) in radians
-     * @return a complex number, whose multiplication corresponds to a rotation by the given angle.
-     */
     static Complex rotation(double radians) {
-        return new Complex(-Math.cos(radians), Math.sin(radians));
+        return new Complex(Math.cos(radians), Math.sin(radians));
     }
 
-    /**
-     * Creates a complex number with null imaginary part
-     *
-     * @param real the real component
-     * @return the complex <code>real + 0 i</code>
-     */
+    // @return the complex <code>real + 0 i</code>
+
     public static Complex real(double real) {
         return new Complex(real, 0);
     }
 
-    /**
-     * Addition of two complex numbers
-     *
-     * @param addend a complex
-     * @return the complex {@code this + addend}
-     */
+    // @return the complex {@code this + addend}
+
     public Complex add(Complex addend) {
         return new Complex(this.real + addend.real,
                 this.imaginary + addend.imaginary);
     }
 
-    /**
-     * The negation of a complex number
-     *
-     * @return A complex <code>c</code> such that <code>this + c = 0</code>
-     */
+    // @return A complex <code>c</code> such that <code>this + c = 0</code>
+
     Complex negate() {
         return new Complex(-this.real, -this.imaginary);
     }
 
-    /**
-     * The conjugate of a complex number
-     *
-     * @return A complex <code>c</code> such that <code>this * c = ||this|| ** 2</code>
-     */
+    // @return A complex <code>c</code> such that <code>this * c = ||this|| ** 2</code>
+
     Complex conjugate() {
         return new Complex(this.real, -this.imaginary);
     }
 
-    /**
-     * Subtraction of two complex numbers
-     *
-     * @param subtrahend the complex to be subtracted from <code>this</code>
-     * @return the complex number <code>this - subtrahend</code>
-     */
+
+    //@param subtrahend the complex to be subtracted from <code>this</code>
+    //@return the complex number <code>this - subtrahend</code>
+
     Complex subtract(Complex subtrahend) {
         return new Complex( this.real - subtrahend.real,this.imaginary - subtrahend.imaginary);
     }
 
-    /**
-     * Multiplication of two complex numbers
-     *
-     * @param factor the complex number to multiply to <code>this</code>
-     * @return the complex number {@code this * factor}
-     */
+    //@param factor the complex number to multiply to <code>this</code>
+    //@return the complex number {@code this * factor}
+
     Complex multiply(Complex factor) {
         return new Complex(
-                this.real * factor.real + this.imaginary * factor.imaginary,
+                this.real * factor.real - this.imaginary * factor.imaginary,
                 this.real * factor.imaginary + this.imaginary * factor.real
         );
     }
 
-    /**
-     * Squared modulus of a complex number
-     *
-     * @return <code>||this|| ** 2</code>
-     */
+    // @return <code>||this|| ** 2</code>
+
     double squaredModulus() {
         return (real * real) + (imaginary * imaginary);
     }
 
-    /**
-     * Modulus (distance to zero) of a complex number
-     *
-     * @return <code>||this||</code>
-     */
+    //@return <code>||this||</code>
+
     double modulus() {
         return Math.sqrt(squaredModulus());
     }
 
+    //@return a complex number <code>c</code> such that <code>this * c = 1</code>
 
-    /**
-     * reciprocal of a complex number
-     *
-     * @return a complex number <code>c</code> such that <code>this * c = 1</code>
-     */
     Complex reciprocal() {
-        if( (this.imaginary==0)&&(this.real==0)){
+        if(this.equals(ZERO)){
             throw new ArithmeticException("divide by zero");}
 
         double m = squaredModulus();
         if(m==0){
-            throw new ArithmeticException("divide by zero");}
+            throw new ArithmeticException("divide by zero");
+        }
         return new Complex(real / m, -imaginary / m);
     }
 
-    /**
-     * Division of two complex numbers
-     *
-     * @param divisor the denominator (a complex number)
-     * @return the complex number <code>this / divisor</code>
-     */
+    // @return the complex number <code>this / divisor</code>
+
     Complex divide(Complex divisor) {
-        if( (divisor.imaginary==0)&&(divisor.real==0)){
+        if(divisor.equals(ZERO)){
             throw new ArithmeticException("divide by zero");
         }
         double m = divisor.squaredModulus();
         if(m==0){
-            throw new ArithmeticException("divide by zero");}
+            throw new ArithmeticException("divide by zero");
+        }
         return new Complex(
-                (this.real + divisor.real + this.imaginary + divisor.imaginary) / m,
+                (this.real * divisor.real + this.imaginary * divisor.imaginary) / m,
                 (this.imaginary * divisor.real - this.real * divisor.imaginary) / m
         );
     }
 
+    //@return the complex number <code>this ** p</code>
 
-    /**
-     * Integral power of a complex number
-     *
-     * @param p a non-negative integer
-     * @return the complex number <code>this ** p</code>
-     */
     Complex pow(int p) {
         if (p == 0)
-            return ZERO;
+            return ONE;
         Complex result = (this.multiply(this)).pow(p / 2);
         if (p % 2 == 1)
             result = result.multiply(this);
@@ -198,12 +150,11 @@ public class Complex {
 
     /**
      * Scalar multiplication of a complex number
-     *
      * @param lambda a scalar number
      * @return the complex number <code>lambda * this</code>
      */
     public Complex scale(double lambda) {
-        return new Complex(lambda * real, lambda + imaginary);
+        return new Complex(lambda * real, lambda * imaginary);
     }
 
 
@@ -214,7 +165,7 @@ public class Complex {
         if (o == null || getClass() != o.getClass())
             return false;
         Complex complex = (Complex) o;
-        return Helpers.doubleCompare(complex.real, real)==0 ||
+        return Helpers.doubleCompare(complex.real, real)==0 &&
                 Helpers.doubleCompare(complex.imaginary, imaginary)==0;
     }
 
